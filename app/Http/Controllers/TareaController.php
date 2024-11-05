@@ -92,17 +92,78 @@ class TareaController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(tarea $tarea)
+    public function edit(Request $request , $id)
     {
         //
-    }
+        $tarea = tarea::find($id);
+        if(!$tarea){
+            $data = [
+                'message' => 'Tarea no Encontrada',
+                'status' => 404
+            ];
+            return response()->json($data,404);
+        }
+        $valid = Validator::make($request->all(),[
+            'nombre' =>'max:255',
+            'descripcion'=>'max:250'
+        ]);
+        if($valid->fails()){
+            $data = [
+                'message'=>'Error en la validacion',
+                'errors'=>$valid->errors(),
+                'status'=>400
+            ];
+            return response()->json($data,400);
+        }
+        if($request->has('nombre')){
+            $tarea->nombre = $request->nombre;
+        }else{
+            $tarea->descripcion = $request->descripcion;
+        }
+        $tarea->save();
+        $data = [
+            'message'=>'Tarea actualizada',
+            'tarea'=>$tarea,
+            'status'=>200
+        ];
+        return response()->json($data,200);
+    } 
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, tarea $tarea)
+    public function update(Request $request, $id)
     {
         //
+        $tarea = tarea::find($id);
+        if(!$tarea){
+            $data = [
+                'message' => 'Tarea no Encontrada',
+                'status' => 404
+            ];
+            return response()->json($data,404);
+        }
+        $validacion = Validator::make($request->all(),[
+            'nombre'=>'required',
+            "descripcion"=>'required'
+        ]);
+        if($validacion->fails()){
+            $data = [
+                'message'=>'Error validando los datos',
+                'error'=>$validacion->errors(),
+                'status'=>400
+            ];
+            return response()->json($data,400);
+        }
+        $tarea->nombre = $request->nombre;
+        $tarea->descripcion = $request->descripcion;
+        $tarea->save();
+        $data = [
+            'message'=>'Actualizado con exito',
+            'tareas'=>$tarea,
+            'status'=>200
+        ];
+        return response()->json($data,200);
     }
 
     /**
