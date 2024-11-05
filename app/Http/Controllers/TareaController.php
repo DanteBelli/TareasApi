@@ -108,8 +108,22 @@ class TareaController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(tarea $tarea)
+    public function destroy($id)
     {
         //elimino tarea
+        $tareas = tarea::find($id);
+        if(!$tareas){
+            $data = [
+                'message' => 'Tarea no encontrada',
+                'status' => 404
+            ];
+            return response()->json($data,404);
+        }
+        $tareas->delete();
+        $data = [
+            'message' => 'Tarea eliminada con Exito',
+            'status' =>200
+        ];
+        return response()->json($data,200);
     }
 }
